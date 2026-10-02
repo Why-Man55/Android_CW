@@ -6,11 +6,18 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext // ОБЯЗАТЕЛЬНО: для получения context в Compose
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.dp
 
 class FirstScreenActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,8 +35,8 @@ class FirstScreenActivity : ComponentActivity() {
             val authorName = stringResource(R.string.author_name)
             val groupNumber = stringResource(R.string.group_number)
 
-            Text(text = authorName)
-            Text(text = groupNumber)
+            Text(text = authorName, Modifier.padding(top = 64.dp, start = 8.dp,), fontFamily = FontFamily.Serif)
+            Text(text = groupNumber, Modifier.padding(8.dp), fontFamily = FontFamily.Serif)
 
             Button(onClick = {
                 val intent = Intent(context, SecondScreenActivity::class.java).apply {
@@ -37,8 +44,8 @@ class FirstScreenActivity : ComponentActivity() {
                     putExtra("TEXT_GROUP", groupNumber)
                 }
                 context.startActivity(intent)
-            }) {
-                Text("To second screen")
+            }, Modifier.padding(top = 16.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)) {
+                Text("To second screen", color = colorResource(R.color.custom_gray))
             }
         }
     }
