@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">ClassWork</string>
+    <string name="second_screen_name">2 screen</string>
+    <string name="author_name">Галимов Камиль</string>
+    <string name="group_number">11-505</string>
+    <string name="extra_error">НИЧЕГО НЕ ПРИШЛО</string>
 </resources>
