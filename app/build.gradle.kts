@@ -1,18 +1,16 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.jetbrains.kotlin.android)
-    alias(libs.plugins.jetbrains.kotlin.compose)
-    alias(libs.plugins.jetbrains.kotlin.serialization)
+    id("org.jetbrains.kotlin.plugin.compose")
 }
 
 android {
     namespace = "com.example.classwork"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.example.classwork"
-        minSdk = 24
-        targetSdk = 35
+        minSdk = 29
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0"
 
@@ -28,25 +26,19 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
+
     buildFeatures {
+        viewBinding = true
         compose = true
     }
 }
 
 dependencies {
-    constraints {
-        implementation("androidx.core:core:1.15.0")
-        implementation("androidx.core:core-ktx:1.15.0")
-    }
-    implementation(libs.androidx.activity.ktx)
-    implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.ktx)
     implementation(platform(libs.compose.bom))
     implementation("androidx.compose.ui:ui")
@@ -59,7 +51,20 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.7.0")
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.material3.android)
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-graphics")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material3:material3:1.3.1")
+    implementation("androidx.compose.foundation:foundation")
+    implementation("androidx.activity:activity-compose")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose")
+    debugImplementation("androidx.compose.ui:ui-tooling")
 }
