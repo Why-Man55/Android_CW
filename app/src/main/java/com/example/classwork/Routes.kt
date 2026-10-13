@@ -3,7 +3,7 @@ package com.example.classwork
 import kotlinx.serialization.Serializable
 
 @Serializable
-object First
+object Cats
 
 @Serializable
-data class Second(val email: String, val password: String)
+data class CatInfo(val name: String, val image: String, val info: String)

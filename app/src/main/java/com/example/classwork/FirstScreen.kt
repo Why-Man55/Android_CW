@@ -1,77 +1,47 @@
 package com.example.classwork
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Card
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
-fun FirstScreen(onNavigateToSecondScreen: (email: String, password: String) -> Unit) {
+fun CatsScreen(onNavigateToCatInfo: (name: String, image: String, info: String) -> Unit) {
 
-    var emailText by remember { mutableStateOf("") }
-    var passwordText by remember { mutableStateOf("") }
-    var isEmailEmpty by remember { mutableStateOf(false) }
-    var isPasswordEmpty by remember { mutableStateOf(false) }
-    var isTestsGood by remember {mutableStateOf(false)}
+    val cats = listOf(Cat("Мейн-кун", "https://cataas.com/cat", "крупная, мощная кошка с густой шерстью и дружелюбным характером"),
+        Cat("Британская короткошерстная", "https://cataas.com/cat", "спокойный, независимый питомец с плюшевой шерстью, отлично подходящий для квартиры"),
+        Cat("Шотландская вислоухая", "https://cataas.com/cat", "ласковая кошка с характерными загнутыми вперед ушками и высоким интеллектом"),
+        Cat("Рэгдолл", "https://cataas.com/cat", "невероятно мягкая и послушная кошка, которая полностью расслабляется на руках у хозяина"),
+        Cat("Сибирская кошкаун", "https://cataas.com/cat", "сильная, энергичная и здоровая порода с пышной шерстью, которая часто считается гипоаллергенной"),
+        Cat("Сфинкс", "https://cataas.com/cat", "умная, преданная и активная лысая кошка, любящая внимание и контакт с человеком"),
+        Cat("Сиамская кошка", "https://cataas.com/cat", " грациозная, общительная и голосистая кошка с яркими голубыми глазами и окрасом колор-пойнт"),
+        Cat("Русская голубая", "https://cataas.com/cat", "сдержанная, тихая и умная кошка с серебристо-голубой шерстью и зелеными глазами"),
+        Cat("Персидская кошка", "https://cataas.com/cat", "спокойное длинношерстное животное с аристократичной и размеренной манерой поведения"),
+        Cat("Абиссинская кошкан", "https://cataas.com/cat", " — активная, игривая и любознательная короткошерстная кошка с тикированным окрасом"))
 
-    val validation = {
-        isEmailEmpty = emailText.isEmpty()
-        isPasswordEmpty = passwordText.isEmpty()
-        isTestsGood = (emailText.matches(("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$").toRegex()) &&
-                passwordText.length >= 8 && passwordText.contains(""".*[a-zA-Z].*""") && passwordText.contains(""".*[0-9].*"""))
+    Column {
+        Text("Подборка котиков:", color = Color.Magenta, fontSize = 24.sp)
 
-        if (isEmailEmpty && isPasswordEmpty && isTestsGood) {
-            onNavigateToSecondScreen(emailText, passwordText)
-        }
-    }
-
-    Column() {
-        if (isEmailEmpty) {
-            Text(text = stringResource(R.string.email_error), color = androidx.compose.ui.graphics.Color.Red)
-        }
-
-        TextField(
-            value = emailText,
-            onValueChange = { emailText = it},
-            label = {Text(stringResource(R.string.email_placeholder))},
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-            modifier = Modifier.padding(bottom = 16.dp, start = 16.dp)
-        )
-        if (isPasswordEmpty) {
-            Text(text = stringResource(R.string.email_error), color = androidx.compose.ui.graphics.Color.Red)
-        }
-
-        TextField(
-            value = "*".repeat(passwordText.length),
-            onValueChange = { passwordText = it},
-            label = {Text(stringResource(R.string.password_placeholder))},
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(
-                onDone = { validation() }
-            ),
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        if (!isTestsGood) {
-            Text(text = stringResource(R.string.button_tests_error), color = androidx.compose.ui.graphics.Color.Red)
-        }
-
-        Button(onClick = {
-            validation()
-         },) {
-            Text(stringResource(R.string.button_enter))
+        LazyColumn {
+            items(cats) { cat ->
+                Card(
+                    modifier = Modifier
+                        .padding(start = 8.dp, top = 16.dp)
+                        .clickable {
+                            onNavigateToCatInfo(cat.name, cat.image, cat.info)
+                        }
+                ) {
+                    Text(text = cat.name, fontSize = 16.sp)
+                }
+            }
         }
     }
 }

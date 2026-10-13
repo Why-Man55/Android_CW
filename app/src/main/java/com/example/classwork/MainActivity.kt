@@ -24,23 +24,21 @@ fun AppNav() {
 
     NavHost (
         navController = navController,
-        startDestination = First
+        startDestination = Cats
     ) {
-        composable<First> {
-            FirstScreen (
-                onNavigateToSecondScreen = { email, password ->
-                    navController.navigate(Second(email = email, password = password))
+        composable<Cats> {
+            CatsScreen (
+                onNavigateToCatInfo = { name, image, info ->
+                    navController.navigate(CatInfo(name, image, info))
                 }
             )
         }
 
-        composable<Second> { entry ->
-            val args = entry.toRoute<Second>()
-            SecondScreen (
-                email = args.email,
-                password = args.password,
-                onBack = {navController.popBackStack()}
-            )
+        composable<CatInfo> { entry ->
+            val args = entry.toRoute<CatInfo>()
+            CatInfoScreen (
+                name = args.name,
+                image = args.image,
+                info = args.info)}
         }
     }
-}

@@ -1,91 +1,24 @@
 package com.example.classwork
 
-import android.content.ClipData
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.material3.Button
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.ClipEntry
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import kotlinx.coroutines.launch
 
 @Composable
-fun SecondScreen(email:String, password: String, onBack: () -> Unit) {
-    val successUrl = ""
-    val errorUrl = ""
+fun CatInfoScreen(name: String, image: String, info: String) {
 
-    val clipboard = LocalClipboardManager.current
-    val currentPassword = generatePassword()
+    Column {
+        AsyncImage(model = image, contentDescription = "", Modifier.fillMaxWidth())
 
-    var text by remember { mutableStateOf("") }
-    var showText by remember { mutableStateOf(false) }
-    Column() {
-        if (password == currentPassword){
-            AsyncImage(
-                model = successUrl,
-                contentDescription = stringResource(R.string.image_success_login)
-            )
-        } else {
-            AsyncImage(model = errorUrl,
-                contentDescription = stringResource(R.string.image_error_login)
-            )
-        }
+        Text(name, Modifier.padding(start = 32.dp, top = 16.dp, bottom = 16.dp ), fontSize = 24.sp, fontWeight = FontWeight.Bold)
 
-        TextField (
-            value = text,
-            onValueChange = {
-                text = if (showText) {
-                    it
-                } else {
-                    "*".repeat(it.length)
-                }
-            }
-        )
-
-        Row {
-            Button(onClick = {
-                showText = !showText
-            }) {
-                Text(stringResource(R.string.button_show_text))
-            }
-
-            Button(onClick = {onBack()}) {
-                Text(stringResource(R.string.button_back))
-            }
-
-            Button(onClick = {
-                clipboard.setText(AnnotatedString(text))
-            }) {
-                Text(stringResource(R.string.button_copy))
-            }
-
-        }
+        Text(info, Modifier.padding(8.dp), fontSize = 16.sp)
     }
-}
-
-fun generatePassword(): String {
-    val letters = ('a'..'z') + ('A'..'Z')
-    val digits = ('0'..'9')
-    val allChars = letters + digits
-
-    val password = mutableListOf(
-        letters.random(),
-        digits.random()
-    )
-
-    repeat(6) {
-        password.add(allChars.random())
-    }
-
-    return password.shuffled().joinToString("")
 }
