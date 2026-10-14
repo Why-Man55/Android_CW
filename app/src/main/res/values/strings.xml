@@ -4,7 +4,7 @@
     <string name="email_placeholder">Email</string>
     <string name="password_placeholder">Password</string>
     <string name="button_enter">Войти</string>
-    <string name="button_tests_error">Пароль не соответствует стилю</string>
+    <string name="button_tests_error">Почта или пароль не соответствует стилю</string>
     <string name="image_success_login">Успешный вход!</string>
     <string name="image_error_login">Неверный пароль</string>
     <string name="button_show_text">Показать пароль</string>

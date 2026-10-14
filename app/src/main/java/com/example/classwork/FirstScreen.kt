@@ -34,7 +34,8 @@ fun FirstScreen(onNavigateToSecondScreen: (email: String, password: String) -> U
             isPasswordEmpty = passwordText.isEmpty()
 
             val isEmailValid = emailText.matches(("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$").toRegex())
-            val isPasswordValid = true
+            val isPasswordValid = passwordText.length >= 8 &&
+                passwordText.matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]+$".toRegex())
 
             isTestsGood = isEmailValid && isPasswordValid
 
@@ -87,7 +88,7 @@ fun FirstScreen(onNavigateToSecondScreen: (email: String, password: String) -> U
             modifier = Modifier.padding(top = 16.dp, start = 16.dp)
         )
 
-        if (!isTestsGood) {
+        if (!isEmailEmpty && !isPasswordEmpty && !isTestsGood) {
             Text(
                 text = stringResource(R.string.button_tests_error),
                 color = androidx.compose.ui.graphics.Color.Red,
