@@ -1,13 +1,16 @@
 <resources>
     <string name="app_name">ClassWork</string>
-    <string name="email_error">Это поле должно быть заполнено</string>
+    <string name="empty_error">Это поле должно быть заполнено</string>
     <string name="email_placeholder">Email</string>
     <string name="password_placeholder">Password</string>
     <string name="button_enter">Войти</string>
-    <string name="button_tests_error">Логин или пароль неверны!</string>
+    <string name="button_tests_error">Пароль не соответствует стилю</string>
     <string name="image_success_login">Успешный вход!</string>
     <string name="image_error_login">Неверный пароль</string>
     <string name="button_show_text">Показать пароль</string>
     <string name="button_back">Назад</string>
     <string name="button_copy">Скопировать</string>
+    <string name="success_url"><![CDATA[https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRW2SzkWF0V47GgzTPi4HNFlPij8RDm_R2ErbewdhvTuQ&s=10]]></string>
+    <string name="error_url"><![CDATA[https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQR11lJ-Dj3UE0v0XYMYqQSkPJTB_lqNFOI8EMFsn2vkg&s=10]]></string>
+    <string name="button_hide_text">Скрыть</string>
 </resources>
