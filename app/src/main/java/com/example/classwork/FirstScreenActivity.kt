@@ -4,8 +4,10 @@ import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -17,6 +19,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
@@ -26,12 +29,15 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
@@ -65,22 +71,49 @@ class FirstScreenActivity : AppCompatActivity() {
     }
 }
 
+const val ACTION_NOTIF_DISMISSED = "com.example.classwork.NOTIF_DISMISSED"
+
 @Composable
 fun FirstScreen() {
     val context = LocalContext.current
+
+    var notifId by remember { mutableIntStateOf(1000) }
 
     var headText by remember { mutableStateOf("") }
     var bodyText by remember {mutableStateOf("") }
     var isCancellable by remember { mutableStateOf(false) }
     var dropMenuExpanded by remember { mutableStateOf(false) }
     var dropMenuContent by remember { mutableStateOf("MIN") }
+    var refactorText by remember {mutableStateOf("")}
 
     var showDeniedScreen by remember {mutableStateOf(false)}
+    var isAnyNotif by remember { mutableStateOf(hasActiveNotification(context)) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         showDeniedScreen = !isGranted
+    }
+
+    DisposableEffect(context) {
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context1: Context?, intent: Intent?) {
+                if (intent?.action == ACTION_NOTIF_DISMISSED) {
+                    isAnyNotif = hasActiveNotification(context)
+                }
+            }
+        }
+
+        val filter = IntentFilter(ACTION_NOTIF_DISMISSED)
+        ContextCompat.registerReceiver(
+            context,
+            receiver,
+            filter,
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
+        onDispose {
+            context.unregisterReceiver(receiver)
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -90,9 +123,8 @@ fun FirstScreen() {
     }
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        if (hasNotificationPermission(context)) {
-            showDeniedScreen = false
-        }
+        showDeniedScreen = !hasNotificationPermission(context)
+        isAnyNotif = hasActiveNotification(context)
     }
 
     val prepareSend = {
@@ -109,17 +141,19 @@ fun FirstScreen() {
         }
 
         createNotifChannel(context, dropMenuContent, importance)
-        sendNotification(context, headText, bodyText, dropMenuContent, isCancellable)
+        notifId++
+        sendNotification(context, headText, bodyText, dropMenuContent, notifId, isCancellable)
+        isAnyNotif = true
     }
 
     if (showDeniedScreen) {
         Column {
-            Text("Для корректной работы приложения требуется разрешение на отправку уведомлений!")
+            Text(stringResource(R.string.notif_perm_error_screen_text))
 
             Button(
                 onClick = { openSettings(context)}
             ) {
-                Text("В настройки")
+                Text(stringResource(R.string.notif_perm_error_screen_button))
             }
         }
     } else {
@@ -127,14 +161,14 @@ fun FirstScreen() {
             TextField(
                 value = headText,
                 onValueChange = { headText = it },
-                label = {Text("Заголовок") },
+                label = {Text(stringResource(R.string.notif_title_label)) },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
             )
 
             TextField(
                 value = bodyText,
                 onValueChange = { bodyText = it },
-                label = {Text("Тело") },
+                label = {Text(stringResource(R.string.notif_body_label)) },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
             )
 
@@ -171,14 +205,69 @@ fun FirstScreen() {
                         prepareSend()
                     } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                        prepareSend()
                     }
                 }
             ) {
-                Text("Отправить уведомление")
+                Text(stringResource(R.string.notif_send_button))
+            }
+
+            Row {
+                TextField(
+                    value = refactorText,
+                    onValueChange = {
+                        refactorText = it
+                    },
+                    label = {Text(stringResource(R.string.notif_refactor_button))},
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    enabled = isAnyNotif
+                )
+
+                Text("Последнее уведомление: $notifId")
+            }
+
+            Row {
+               Button(
+                   onClick = {
+                       val id = refactorText.toInt()
+                       if (hasActiveNotifWithId(context, id)) {
+                           sendNotification(context, headText, bodyText, dropMenuContent, id, isCancellable)
+                       } else {
+                           Toast.makeText(context,
+                               context.getString(R.string.notif_error_null_id_toast), Toast.LENGTH_SHORT).show()
+                       }
+                   }
+               ) {
+                   Text(stringResource(R.string.notif_refactor_button))
+               }
+               Button(
+                   onClick = {
+                       if (isAnyNotif) {
+                           NotificationManagerCompat.from(context).cancelAll()
+                           isAnyNotif = false
+                       } else {
+                           Toast.makeText(context,
+                               context.getString(R.string.notif_error_empty_toast), Toast.LENGTH_SHORT).show()
+                       }
+                   },
+                   enabled = isAnyNotif
+               ) {
+                   Text(stringResource(R.string.notif_delete_button))
+               }
             }
         }
     }
+}
+
+private fun hasActiveNotifWithId(context: Context, id: Int): Boolean {
+    val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    return manager.activeNotifications.any {it.id == id}
+}
+
+private fun hasActiveNotification(context: Context) : Boolean {
+    val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    val activeNotif = manager.activeNotifications
+
+    return activeNotif.isNotEmpty()
 }
 
 private fun hasNotificationPermission(context: Context): Boolean {
@@ -191,21 +280,32 @@ private fun hasNotificationPermission(context: Context): Boolean {
     }
 }
 
-private fun sendNotification(context: Context, head: String, body: String, type:String, isCancellable: Boolean) {
+private fun sendNotification(context: Context, head: String, body: String, type:String, id:Int, isCancellable: Boolean) {
     if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
         return
     }
 
-    val intent = Intent(context, FirstScreenActivity::class.java).apply {
+    val clickIntent = Intent(context, FirstScreenActivity::class.java).apply {
         flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
         putExtra("EXTRA_TITLE", head)
         putExtra("EXTRA_BODY", body)
     }
 
-    val pendingIntent = PendingIntent.getActivity(
+    val clickPendingIntent = PendingIntent.getActivity(
         context,
-        0,
-        intent,
+        id,
+        clickIntent,
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+    )
+
+    val deleteIntent = Intent(ACTION_NOTIF_DISMISSED).apply {
+        setPackage(context.packageName)
+    }
+
+    val deletePendingIntent = PendingIntent.getBroadcast(
+        context,
+        1,
+        deleteIntent,
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
 
@@ -215,9 +315,11 @@ private fun sendNotification(context: Context, head: String, body: String, type:
         .setContentText(body)
         .setOngoing(isCancellable)
         .setAutoCancel(!isCancellable)
-        .setContentIntent(pendingIntent)
+        .setContentIntent(clickPendingIntent)
+        .setDeleteIntent(deletePendingIntent)
+        .setOnlyAlertOnce(true)
 
-    NotificationManagerCompat.from(context).notify(1001, builder.build())
+    NotificationManagerCompat.from(context).notify(id, builder.build())
 }
 
 private fun createNotifChannel(context: Context, type: String, importance: Int) {

@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">ClassWork</string>
+    <string name="notif_perm_error_screen_text">Для корректной работы приложения требуется разрешение на отправку уведомлений!</string>
+    <string name="notif_perm_error_screen_button">В настройки</string>
+    <string name="notif_title_label">Заголовок</string>
+    <string name="notif_body_label">Тело</string>
+    <string name="notif_send_button">Отправить уведомление</string>
+    <string name="notif_refactor_label">Заменить</string>
+    <string name="notif_error_null_id_toast">Уведомления с таком id нет</string>
+    <string name="notif_refactor_button">Редактировать</string>
+    <string name="notif_error_empty_toast">Уведомлений нет</string>
+    <string name="notif_delete_button">Удалить все</string>
 </resources>
